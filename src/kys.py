@@ -3,17 +3,73 @@ import evdev
 import os
 import re
 
+import types
+import importlib.util #To bind the functions in the generated file
+
+from selectors import DefaultSelector, EVENT_READ #To allow selecting multiple devices
+
 
 chosen_devices = {}
 devices_dict = {}
 
 
+def importCode(code, module_name):
+
+    module = types.ModuleType(module_name)
+    exec(code, module.__dict__)
+
+    return module
+
+def bind_key_macros(choices,filename):
+    #grab the devices
+    #Bind the functions in the config file to the keystrokesS
+    code = ""
+    with open(f"{filename}/{filename}.py","r") as fp:
+
+        code = fp.read()
+
+    m = importCode(code,f"{filename}")
+    m.func_KEY_Q_16()
+
+    selector = DefaultSelector()
+    for choice in choices:
+        devices_dict[choice].grab()
+        selector.register(devices_dict[choice],EVENT_READ)
+    while True:
+        for key,mask in selector.select():
+            device = key.fileobj
+            for event in device.read():
+                print(evdev.categorize(event))
+                print(type(event))
+                print(event.code)
+                print(evdev.ecodes.KEY[event.code])
+                print(event.type)
+                print(event.value)
+
+                print(f"m.func_{evdev.ecodes.KEY[event.code]}_{event.code}()")
+                exec(f"m.func_{evdev.ecodes.KEY[event.code]}_{event.code}()")
+
+    
+
 def create_config(name,keys):
     name = name.replace(' ', '_')
     name = re.sub(r'[^a-zA-Z0-9_]', '', name)
+    try:
+        os.mkdir(f"{name}")
+    except:
+        print("File Already There")
+    try:
+        open(f"{name}/__init__.py", "a").close()
+    except:
+        print("__init__ file already there")
+    
     for key in keys:
-        with open(f"{name}.py","a") as fp:
-            fp.write(f"def func_{key[0]}_{key[1]}():\n\t pass\n")
+        if isinstance(key[0],list):
+            continue
+        with open(f"{name}/{name}.py","a+") as fp:
+            fp.write(f"def func_{key[0]}_{key[1]}():\n\tpass\n")
+
+    return name
         
     
 
@@ -29,6 +85,7 @@ def list_devices():
         print(dev_format.format(index,device))
 
 def create_map(choices):
+    filename = "none"
     print(devices_dict)
     macro_dict = {}
     for choice in choices:
@@ -38,7 +95,10 @@ def create_map(choices):
                 macro_dict[devices_dict[int(choice)].name] = dev_input_dict[key]
 
     for name,keys in macro_dict.items():
-        create_config(name,keys)
+        filename = create_config(name,keys)
+        print(f"{name}.py created successfully!")
+
+    return filename
 
 
 
@@ -57,13 +117,30 @@ def choose_devices():
 
     confirmation = input(f"Your Selections are {choices} confirm (y/n): ")
     choices = set(choices)
+    filename = "none"
 
     if confirmation.lower() in ["y", "yes"] and choices.issubset(set(devices_dict.keys())):
-        create_map(choices)
+        filename = create_map(choices)
     elif confirmation.lower() in ["n", "no"]:
         print("Exiting...")
     else:
         print("Invalid Input Try Again")
+
+    confirmation = input(f"Start the macros?  confirm (y/n): ")
+
+    if confirmation.lower() in ["y", "yes"]:
+        print(filename)
+        bind_key_macros(choices,filename)
+
+    elif confirmation.lower() in ["n", "no"]:
+        print("Exiting...")
+    else:
+        print("Invalid Input Try Again")
+
+
+
+
+    
 
 
         

@@ -4,7 +4,7 @@
 
 
 Goals for v0.1
-- A command line tool that lists all the available input devices and allow user to select the ones they wish
-to use for macros.
-- Generating config file for each device, with each input mapped to it's original action, this original action
-now can be replaced with anything the user wants.
+~~- A command line tool that lists all the available input devices and allow user to select the ones they wish
+to use for macros.~~ 
+
+~~- Generating config (a file containing individual function for each available key press) file for each device.~~  
