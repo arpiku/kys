@@ -8,10 +8,13 @@ chosen_devices = {}
 devices_dict = {}
 
 
-def create_config(name,):
+def create_config(name,keys):
     name = name.replace(' ', '_')
     name = re.sub(r'[^a-zA-Z0-9_]', '', name)
-    with open(f"name.py","w")
+    for key in keys:
+        with open(f"{name}.py","a") as fp:
+            fp.write(f"def func_{key[0]}_{key[1]}():\n\t pass\n")
+        
     
 
 def create_dev_dict():
