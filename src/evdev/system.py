@@ -1,7 +1,7 @@
 import evdev
 
 
-def get_system():
+def get_evdev():
     return evdev
 
 
