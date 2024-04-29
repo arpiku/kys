@@ -24,6 +24,14 @@ Generators !!!
 Note: As of right now I am attempting to make everything functional and break them into very small chunks 
 in order to remove dependency issues, and let's see if I have learned at least some functional programming..
 
+Gonna start adding more structure to these notes:
+  - April 13th 09:44
+   - Side Project, a service to better prepare the documentation as I write the code.
+
+  - April 29th 17:45
+   - Was busy doing some leetcode, anyways back to work, heading forward on nixxy will require a lot of things to be done,
+  right now gonna just complete kys enough to allow custom shortcuts based on any sort input device.
+
 
 
 
